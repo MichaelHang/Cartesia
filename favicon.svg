@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c1c34"/>
+      <stop offset="1" stop-color="#0e0e1a"/>
+    </linearGradient>
+    <linearGradient id="curve" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c83ff"/>
+      <stop offset="1" stop-color="#4dffff"/>
+    </linearGradient>
+  </defs>
+  <!-- 深色圆角底板 + 描边 -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/>
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="13.25" fill="none" stroke="rgba(124,131,255,0.4)" stroke-width="1.5"/>
+  <!-- 坐标轴 -->
+  <line x1="12" y1="47" x2="54" y2="47" stroke="rgba(232,232,240,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="20" y1="55" x2="20" y2="11" stroke="rgba(232,232,240,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 抛物线曲线 -->
+  <path d="M 24 15 Q 34 60 52 13" fill="none" stroke="url(#curve)" stroke-width="4" stroke-linecap="round"/>
+  <!-- 曲线顶点标记 -->
+  <circle cx="36" cy="37" r="3.2" fill="#ff6b9d"/>
+</svg>

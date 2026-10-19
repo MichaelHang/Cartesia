@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometry Board - 数学画图工具</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css?v=5">
+</head>
+<body>
+  <!-- Main Content -->
+  <div id="main-content">
+
+    <!-- Left Toolbar -->
+    <div id="left-toolbar">
+      <div class="tool-section">
+        <div class="tool-section-title">绘制</div>
+        <div class="tool-group">
+          <button class="tool-btn active" data-tool="select" data-tip="选择/移动 (V)">⟐</button>
+          <button class="tool-btn" data-tool="point" data-tip="点 (P)">•</button>
+          <button class="tool-btn" data-tool="segment" data-tip="线段 (S)">•–•</button>
+          <button class="tool-btn" data-tool="line" data-tip="直线 (L)">╱</button>
+          <button class="tool-btn" data-tool="ray" data-tip="射线">→</button>
+          <button class="tool-btn" data-tool="circle" data-tip="圆 (C)">○</button>
+          <button class="tool-btn" data-tool="polygon" data-tip="多边形（点击加顶点，双击或点起点闭合）">⬠</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-section-title">作图</div>
+        <div class="tool-group">
+          <button class="tool-btn" data-tool="perpendicular" data-tip="垂线">⊥</button>
+          <button class="tool-btn" data-tool="parallel" data-tip="平行线">∥</button>
+          <button class="tool-btn" data-tool="midpoint" data-tip="中点">⊕</button>
+          <button class="tool-btn" data-tool="angle-bisector" data-tip="角平分线">∠</button>
+          <button class="tool-btn" data-tool="perp-bisector" data-tip="垂直平分线">⫡</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-section-title">测量</div>
+        <div class="tool-group">
+          <button class="tool-btn" data-tool="measure-distance" data-tip="测距：点击两个点">📏</button>
+          <button class="tool-btn" data-tool="measure-angle" data-tip="测角：点击三个点（第二个为顶点）">📐</button>
+          <button class="tool-btn" data-tool="measure-area" data-tip="测面积：点击一个多边形">⬜</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-section-title">变换</div>
+        <div class="tool-group">
+          <button class="tool-btn" data-tool="translate" data-tip="平移">↕</button>
+          <button class="tool-btn" data-tool="rotate" data-tip="旋转">↻</button>
+          <button class="tool-btn" data-tool="reflect" data-tip="镜像">↔</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-section-title">其他</div>
+        <div class="tool-group">
+          <button class="tool-btn" data-tool="function" data-tip="函数图像 (F)">𝑓</button>
+          <button class="tool-btn" data-tool="angle-draw" data-tip="画角">∡</button>
+          <button class="tool-btn" data-tool="text" data-tip="文字标签 (T)">T</button>
+        </div>
+      </div>
+      <div class="tool-spacer"></div>
+      <div class="tool-section">
+        <div class="tool-section-title">操作</div>
+        <div class="tool-group actions">
+          <button class="tool-btn" id="btn-undo" data-tip="撤销 (Ctrl+Z)">↩</button>
+          <button class="tool-btn" id="btn-redo" data-tip="重做 (Ctrl+Y)">↪</button>
+          <button class="tool-btn" id="btn-clear" data-tip="清空画布">🗑</button>
+          <button class="tool-btn" id="btn-export" data-tip="导出">⤓</button>
+          <button class="tool-btn" id="btn-reset-view" data-tip="重置视图（回到原点，缩放100%）">⌖</button>
+          <button class="tool-btn" id="btn-snap" data-tip="吸附到网格/点 (开)">⊞</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div id="canvas-container">
+      <canvas id="main-canvas"></canvas>
+      <div id="coord-display">(0, 0)</div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div id="right-sidebar">
+      <div class="sidebar-section">
+        <h3>样式</h3>
+        <div class="style-row">
+          <label>颜色</label>
+          <input type="color" id="stroke-color" value="#1a73e8">
+        </div>
+        <div class="style-row">
+          <label>线宽</label>
+          <input type="range" id="line-width" min="1" max="8" value="2">
+          <span id="line-width-val">2</span>
+        </div>
+        <div class="style-row">
+          <label>线型</label>
+          <select id="line-style">
+            <option value="solid">实线</option>
+            <option value="dashed">虚线</option>
+            <option value="dotted">点线</option>
+          </select>
+        </div>
+        <div class="style-row">
+          <label>填充</label>
+          <input type="range" id="fill-opacity" min="0" max="100" value="0">
+          <span id="fill-opacity-val">0%</span>
+        </div>
+      </div>
+      <div class="sidebar-section object-list-section">
+        <h3>对象列表</h3>
+        <div id="object-list">
+          <p class="empty-hint">画布为空</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="status-bar">
+    <span id="status-tool">选择工具：点击选择对象，拖动移动</span>
+    <span id="status-zoom">缩放: 100%</span>
+  </div>
+
+  <!-- Function Input Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div class="modal">
+      <h3>输入函数表达式</h3>
+      <p class="modal-hint">使用 x, y 作为变量。支持隐式方程如 y^2=8x。可用函数：sin, cos, sqrt, abs, log, exp, pi</p>
+      <input type="text" id="func-input" placeholder="f(x) = " autocomplete="off">
+      <div class="modal-buttons">
+        <button id="btn-func-ok">确定</button>
+        <button id="btn-func-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text Input Modal -->
+  <div id="text-modal-overlay" class="hidden">
+    <div class="modal">
+      <h3>输入文字</h3>
+      <input type="text" id="text-input" placeholder="输入文字标签..." autocomplete="off">
+      <div class="modal-buttons">
+        <button id="btn-text-ok">确定</button>
+        <button id="btn-text-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal-overlay" class="hidden">
+    <div class="modal">
+      <h3>导出图像</h3>
+      <div class="export-options">
+        <div class="export-row">
+          <label>格式</label>
+          <div class="export-format-group">
+            <button class="export-format-btn active" data-format="png">PNG</button>
+            <button class="export-format-btn" data-format="svg">SVG</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <label>坐标系</label>
+          <label class="export-checkbox">
+            <input type="checkbox" id="export-axes" checked>
+            <span>包含坐标轴和网格</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button id="btn-export-ok">导出</button>
+        <button id="btn-export-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js?v=28"></script>
+</body>
+</html>
