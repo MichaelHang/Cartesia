@@ -90,7 +90,27 @@ body::before {
   display: flex;
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
+
+/* ---- Panel Resize Handles ---- */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: col-resize;
+  z-index: 30;
+  transition: background 0.15s;
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+  background: rgba(124, 131, 255, 0.28);
+}
+
+#toolbar-resize { left: calc(var(--toolbar-width) - 3px); }
+#sidebar-resize { right: calc(var(--sidebar-width) - 3px); }
 
 /* ---- Left Toolbar ---- */
 #left-toolbar {
@@ -137,7 +157,8 @@ body::before {
 
 .tool-group {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* 列数随栏宽自适应：拉宽工具栏时按钮自动重排成更多列 */
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
   gap: 6px;
   width: 100%;
   padding: 0 4px;
@@ -614,4 +635,6 @@ body::before {
   #right-sidebar { display: none; }
   #left-toolbar { width: 70px; }
   .tool-btn { width: 40px; height: 34px; font-size: 14px; }
+  .tool-group { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
+  .resize-handle { display: none; }
 }

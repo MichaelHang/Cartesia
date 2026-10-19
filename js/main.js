@@ -1126,6 +1126,70 @@ document.getElementById('fill-opacity').addEventListener('change', commitStyleCh
 
 
 // ============================================================
+// Resizable Sidebars
+// ============================================================
+
+const SIDEBAR_LIMITS = {
+  '--toolbar-width': { min: 130, max: 280, def: 140 },
+  '--sidebar-width': { min: 160, max: 420, def: 220 },
+};
+
+function getStoredWidth(key) {
+  try {
+    const v = parseInt(localStorage.getItem('gb:' + key));
+    const lim = SIDEBAR_LIMITS[key];
+    return v >= lim.min && v <= lim.max ? v : null;
+  } catch { return null; }
+}
+
+// 启动时恢复上次调的宽度
+for (const key of Object.keys(SIDEBAR_LIMITS)) {
+  const saved = getStoredWidth(key);
+  if (saved) document.documentElement.style.setProperty(key, saved + 'px');
+}
+
+function setupPanelResize(handleId, cssVar) {
+  const handle = document.getElementById(handleId);
+  const lim = SIDEBAR_LIMITS[cssVar];
+  // 左栏：向右拖变宽；右栏：向左拖变宽
+  const dir = handleId === 'sidebar-resize' ? -1 : 1;
+
+  handle.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = parseInt(getComputedStyle(document.documentElement).getPropertyValue(cssVar));
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+
+    const onMove = (ev) => {
+      const w = Math.max(lim.min, Math.min(lim.max, startW + (ev.clientX - startX) * dir));
+      document.documentElement.style.setProperty(cssVar, w + 'px');
+      render(); // 画布每帧自检容器尺寸，实时重排
+    };
+    const onUp = (ev) => {
+      handle.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      const w = Math.max(lim.min, Math.min(lim.max, startW + (ev.clientX - startX) * dir));
+      try { localStorage.setItem('gb:' + cssVar, String(w)); } catch { /* 隐私模式等场景下忽略 */ }
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // 双击恢复默认宽度
+  handle.addEventListener('dblclick', () => {
+    document.documentElement.style.setProperty(cssVar, lim.def + 'px');
+    try { localStorage.removeItem('gb:' + cssVar); } catch { /* 忽略 */ }
+    render();
+  });
+}
+
+setupPanelResize('toolbar-resize', '--toolbar-width');
+setupPanelResize('sidebar-resize', '--sidebar-width');
+
+// ============================================================
 // Modal Buttons
 // ============================================================
 

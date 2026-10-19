@@ -305,12 +305,15 @@ export class CanvasManager {
 
   /**
    * 帧首自愈：devicePixelRatio 或容器尺寸变化而没触发 window resize 时
-   * （例如窗口跨显示器拖动），画布背衬会和布局失配，表现为内容错位/被裁切。
-   * 每帧检测一次，失配则重建背衬。
+   * （例如拖动侧栏分隔条、窗口跨显示器拖动），画布背衬会和布局失配，
+   * 表现为内容错位/被裁切。每帧检测一次，失配则重建背衬。
+   * 注意必须读父容器尺寸——canvas 自身带有内联宽高，不会跟随布局收缩。
    */
   _syncSize() {
     const dpr = window.devicePixelRatio || 1;
-    const rect = this.canvas.getBoundingClientRect();
+    const container = this.canvas.parentElement;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;
     if (this.canvas.width !== Math.floor(rect.width * dpr) ||
         this.canvas.height !== Math.floor(rect.height * dpr)) {
